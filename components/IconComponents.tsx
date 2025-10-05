@@ -80,7 +80,7 @@ export const LightbulbIcon: React.FC<IconProps> = (props) => (
 
 export const UsersIcon: React.FC<IconProps> = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.742-.586 9.104 9.104 0 0 0-1.823-3.051 4.5 4.5 0 0 0-6.364-6.364M12 12V3.75m-3.75 8.25V3.75m0 8.25a4.5 4.5 0 0 1-6.364-6.364L12 12m6 6.72a4.5 4.5 0 0 1-6.364-6.364L12 12m-6 6.72a4.5 4.5 0 0 0 6.364 6.364L12 12m6 6.72a9.094 9.094 0 0 1-3.742-.586 9.104 9.104 0 0 1-1.823-3.051L12 12M3.75 12h16.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.742-.586 9.104 9.104 0 0 0-1.823-3.051 4.5 4.5 0 0 0-6.364-6.364M12 12V3.75m-3.75 8.25V3.75m0 8.25a4.5 4.5 0 0 1-6.364-6.364M12 12m6 6.72a4.5 4.5 0 0 1-6.364-6.364M12 12m6 6.72a9.094 9.094 0 0 1-3.742-.586 9.104 9.104 0 0 1-1.823-3.051L12 12M3.75 12h16.5" />
     </svg>
 );
 
@@ -106,5 +106,13 @@ export const TeacherIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5c-2.365 0-4.5-1.12-6-3v-2.25c1.5 1.88 3.635 3 6 3s4.5-1.12 6-3v2.25c-1.5 1.88-3.635 3-6 3Z" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 10.5c-2.485 0-4.5-1.12-6-3m12 3c-1.5 1.88-3.635 3-6 3m6-3v-2.25c1.5 1.88 3.635 3 6 3m-12-3v-2.25c-1.5 1.88-3.635 3-6 3m12 3V15m-6-4.5v4.5m0-4.5v-2.25c1.5 1.88 3.635 3 6 3m-6-3c-1.5 1.88-3.635 3-6 3m12 6.75-3-3-3 3M12 21.75V15" />
+    </svg>
+);
+
+export const GraduationCapIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+        <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.084a1 1 0 0 0 0 1.838l8.57 3.908a2 2 0 0 0 1.66 0z" />
+        <path d="M22 10v6" />
+        <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />
     </svg>
 );
