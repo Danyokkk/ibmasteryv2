@@ -1,19 +1,16 @@
-import React, { useState } from 'react';
-import { User, IBProgramme, IBLevel, UserSubjectSelection, Subject, SubjectGroup } from '../types';
-import { MOCK_USER, IB_SUBJECTS } from '../constants';
-import Button from '../components/shared/Button';
+import { User, IBProgramme, IBLevel, UserSubjectSelection, Subject } from '../types';
 import Card from '../components/shared/Card';
-import Input from '../components/shared/Input';
-import { LogoIcon } from '../components/IconComponents';
+import React, { useState } from 'react';
+import { GraduationCapIcon } from '../components/IconComponents';
 
 // --- Step 1: User Details ---
 interface UserDetailsProps {
-    user: User;
+    user: Partial<User>;
     onComplete: (details: {firstName: string, lastName: string, pronouns: string, yearGroup: string}) => void;
 }
 const UserDetails: React.FC<UserDetailsProps> = ({ user, onComplete }) => {
-    const [firstName, setFirstName] = useState(user.firstName);
-    const [lastName, setLastName] = useState(user.lastName);
+    const [firstName, setFirstName] = useState(user.firstName || '');
+    const [lastName, setLastName] = useState(user.lastName || '');
     const [pronouns, setPronouns] = useState('');
     const [yearGroup, setYearGroup] = useState('11');
 
@@ -123,7 +120,71 @@ const DPSubjectSelection: React.FC<DPSubjectSelectionProps> = ({ onComplete }) =
     )
 }
 
-// --- Step 3: CP Subject Selection ---
+// --- Step 4: MYP Subject Selection ---
+interface MYPSubjectSelectionProps {
+    onComplete: (subjects: UserSubjectSelection[]) => void;
+}
+const MYPSubjectSelection: React.FC<MYPSubjectSelectionProps> = ({ onComplete }) => {
+    const [selections, setSelections] = useState<UserSubjectSelection[]>([]);
+    const TOTAL_SUBJECTS = 5;
+
+    const handleSelect = (subject: Subject, level: IBLevel) => {
+        const existing = selections.find(s => s.subject.id === subject.id);
+        if (existing) {
+            if (existing.level === level) { // Deselect
+                setSelections(selections.filter(s => s.subject.id !== subject.id));
+            } else { // Switch level
+                setSelections(selections.map(s => s.subject.id === subject.id ? {...s, level} : s));
+            }
+        } else { // Add new
+            if (selections.length >= TOTAL_SUBJECTS) return;
+            setSelections([...selections, { subject, level }]);
+        }
+    };
+
+    const canFinish = selections.length === TOTAL_SUBJECTS;
+
+    return (
+        <div>
+            <div className="text-center mb-6">
+                <h2 className="text-2xl font-extrabold text-text-primary">Select Your MYP Subjects</h2>
+                <p className="text-slate-500">Choose {TOTAL_SUBJECTS} subjects for your programme.</p>
+                <div className="mt-4 font-mono text-sm">
+                    <span className={canFinish ? 'text-success font-bold' : 'text-text-neutral'}>
+                        Selected: {selections.length}/{TOTAL_SUBJECTS}
+                    </span>
+                </div>
+            </div>
+            <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2">
+                {IB_SUBJECTS.map(subject => {
+                    const currentSelection = selections.find(s => s.subject.id === subject.id);
+                    return (
+                        <Card
+                            as="button"
+                            key={subject.id}
+                            onClick={() => handleSelect(subject, IBLevel.SL)}
+                            className={`w-full text-left border-2 transition-all p-3 ${currentSelection?.level === IBLevel.SL ? 'border-primary bg-primary/5' : 'border-transparent'}`}
+                        >
+                            <p className="font-semibold text-sm text-text-neutral">{subject.name}</p>
+                            <p className="text-xs text-slate-400">{subject.group}</p>
+                        </Card>
+                    );
+                })}
+            </div>
+            <div className="mt-6">
+                <Button
+                    onClick={() => onComplete(selections)}
+                    fullWidth
+                    disabled={!canFinish}
+                >
+                    Confirm Subjects & Start
+                </Button>
+            </div>
+        </div>
+    );
+};
+
+// --- Step 5: CP Subject Selection ---
 interface CPSubjectSelectionProps {
     onComplete: (subjects: UserSubjectSelection[]) => void;
 }
@@ -185,67 +246,67 @@ const CPSubjectSelection: React.FC<CPSubjectSelectionProps> = ({ onComplete }) =
 };
 
 
-// --- Main Onboarding Component ---
 interface OnboardingPageProps {
-  user: User;
-  onComplete: (user: User) => void;
+    user: User;
+    onComplete: (user: User) => void;
 }
 
 const OnboardingPage: React.FC<OnboardingPageProps> = ({ user, onComplete }) => {
-  const [step, setStep] = useState(0);
-  const [onboardingData, setOnboardingData] = useState<Partial<User>>({});
+    const [step, setStep] = useState(1);
+    const [onboardingData, setOnboardingData] = useState<Partial<User>>({});
 
-  const handleDetailsComplete = (details: {firstName: string, lastName: string}) => {
-      setOnboardingData({ ...onboardingData, ...details });
-      setStep(1);
-  };
-  
-  const handleProgrammeSelect = (selectedProgramme: IBProgramme) => {
-    setOnboardingData({ ...onboardingData, programme: selectedProgramme });
-    setStep(2);
-  };
-  
-  const handleSubjectComplete = (subjects: UserSubjectSelection[]) => {
-      const updatedUser = { ...user, ...onboardingData, subjects };
-      onComplete(updatedUser);
-  }
+    const handleUserDetailsComplete = (details: {firstName: string, lastName: string, pronouns: string, yearGroup: string}) => {
+        setOnboardingData(prev => ({ ...prev, firstName: details.firstName, lastName: details.lastName, pronouns: details.pronouns, yearGroup: details.yearGroup }));
+        setStep(2);
+    };
 
-  const renderStep = () => {
-      switch(step) {
-          case 0: return <UserDetails user={user} onComplete={handleDetailsComplete} />;
-          case 1: return <ProgrammeSelection onSelect={handleProgrammeSelect} />;
-          case 2:
-            if (onboardingData.programme === IBProgramme.DP) {
-                return <DPSubjectSelection onComplete={handleSubjectComplete}/>
-            }
-            if (onboardingData.programme === IBProgramme.CP) {
-                return <CPSubjectSelection onComplete={handleSubjectComplete} />
-            }
-            return (
-                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-text-primary">Programme Setup</h2>
-                  <p className="text-slate-500 my-4">Configuration for {onboardingData.programme} is coming soon! For now, let's proceed with a default setup.</p>
-                  <Button onClick={() => onComplete({ ...user, ...onboardingData } as User)}>Continue</Button>
-              </div>
-            );
-          default: return null;
-      }
-  }
+    const handleProgrammeSelect = (programme: IBProgramme) => {
+        setOnboardingData(prev => ({ ...prev, programme }));
+        if (programme === IBProgramme.DP) {
+            setStep(3);
+        } else if (programme === IBProgramme.MYP) {
+            setStep(4);
+        } else if (programme === IBProgramme.CP) {
+            setStep(5);
+        }
+    };
+    
+    const handleSubjectSelectionComplete = (subjects: UserSubjectSelection[]) => {
+        const subjectProgress: User['subjectProgress'] = {};
+        subjects.forEach(({ subject }) => {
+            subjectProgress[subject.id] = {
+                completion: Math.floor(Math.random() * 40) + 10, // 10-50%
+                predictedScore: Math.floor(Math.random() * 2) + 4, // 4-5
+            };
+        });
 
-  return (
-    <div className="bg-background-light w-full min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-lg mx-auto">
-        <div className="flex flex-col items-center text-center mb-8">
-          <LogoIcon className="h-12 w-12 text-secondary" />
-          <h1 className="text-3xl font-heading font-extrabold text-secondary mt-2">Welcome, {user.firstName}!</h1>
+        const updatedUser: User = { ...user, ...onboardingData, subjects, subjectProgress, onboardingComplete: true };
+        onComplete(updatedUser);
+    };
+
+    const renderStep = () => {
+        switch(step) {
+            case 1: return <UserDetails user={user} onComplete={handleUserDetailsComplete} />;
+            case 2: return <ProgrammeSelection onSelect={handleProgrammeSelect} />;
+            case 3: return <DPSubjectSelection onComplete={handleSubjectSelectionComplete} />;
+            case 4: return <MYPSubjectSelection onComplete={handleSubjectSelectionComplete} />;
+            case 5: return <CPSubjectSelection onComplete={handleSubjectSelectionComplete} />;
+            default: return <div>Onboarding Complete!</div>;
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-background-light flex flex-col items-center justify-center p-4">
+            <div className="w-full max-w-md mx-auto">
+                <div className="flex justify-center mb-6">
+                    <GraduationCapIcon className="w-12 h-12 text-primary" />
+                </div>
+                <Card className="p-6 sm:p-8">
+                    {renderStep()}
+                </Card>
+            </div>
         </div>
-
-        <div className="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-4xl shadow-soft-md">
-            {renderStep()}
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default OnboardingPage;
