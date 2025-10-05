@@ -1,0 +1,7 @@
+{
+  "name": "IBPolina",
+  "description": "IBPolina is a gamified learning and tracking app designed to help IB students master subjects, track coursework, and develop ATL skills, inspired by Duolingo.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
